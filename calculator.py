@@ -12,11 +12,34 @@ Base = 3500
 #
 Taxrate = 0
 
-salary = int( sys.argv[1])
-print(salary)
+try:
+	salary = int(sys.argv[1])
+except:
+	print("Value ERROR")
+
 salary_rm_base = salary - Base
 
-for cnt in range(6):
-    if(TAX_table[cnt] <= salary_rm_base <= TAX_table[cnt+1]):
-        print(cnt)
-        break
+if salary_rm_base <= 0:
+	cnt = 0
+elif 0 < salary_rm_base <= 1500:
+    cnt = 1
+elif 1500 < salary_rm_base <= 4500:
+    cnt = 2
+elif 4500 < salary_rm_base <= 9000:
+    cnt = 3
+elif 9000 < salary_rm_base <= 35000:
+	cnt = 4
+elif 35000 < salary_rm_base <= 55000:
+	cnt = 5
+elif 55000 < salary_rm_base <= 80000:
+	cnt = 6
+elif salary_rm_base > 80000:
+	cnt = 7
+
+#print(TAX_RATE[cnt])
+#print(TAX_De[cnt])
+TAX = (salary_rm_base * TAX_RATE[cnt]) - TAX_De[cnt]
+
+format(TAX, ".2f")
+print("%.2f" %TAX)
+
