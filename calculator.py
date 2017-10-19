@@ -1,10 +1,32 @@
 #!/usr/bin/env python3
 
 import sys
-
-
+import os
 #Base
 Base = 3500
+#Class
+class Config(object):
+	def __init__(self, configfile):
+		self.file = configfile
+		self._config = {}
+	def get_config(self):
+		if os.path.exists(self.file):
+			with open(self.file) as config:
+				# for line in config:                          have question
+				for line in config:
+					line_split = line.split(' = ')
+					print(line_split)
+					if len(line_split) != 2:
+						print("Config File Parameter Error")
+					else:
+						try:
+							self._config[line_split[0]] = float(line_split[1])
+						except:
+							print("Config Parameter Error")
+		else:			
+			print("Can't found file,Please try again")
+			sys.exit()
+
 
 #
 def Cala_Tax(salary):
@@ -29,6 +51,14 @@ def Cala_enhance(salary):
 	social_insurance = salary * sum(SOCIAL_INSURANCE)
 	return social_insurance
 
+def argv_input():
+	if len(sys.argv) != 7:
+		print('Parameter Error')
+	try:
+		print()
+	except:
+		print()
+
 def main():
 	if len(sys.argv) != 2:
 		print('Parameter Error')
@@ -37,6 +67,8 @@ def main():
 	except:
 		print("Value ERROR")
 
+	CONFIG = Config('test.cfg') 
+	CONFIG.get_config()
 	salary_rm_base = salary - Cala_enhance(salary) - Base
 	TAX = Cala_Tax(salary_rm_base)
 
