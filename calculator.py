@@ -2,44 +2,46 @@
 
 import sys
 
-#Table
-TAX_table = [0,1500,4500,9000,35000,55000,80000]
-TAX_RATE = [0,0.03,0.1,0.2,0.25,0.30,0.35,0.45]
-TAX_De = [0,0,105,555,1005,2755,5505,13505]
+
 #Base
 Base = 3500
 
 #
-Taxrate = 0
+def Cala_Tax(salary):
+#Table
+	if salary <= 0:
+		return 0
+	TAX_TABLE = [
+		(80000, 0.45, 13505),
+		(55000, 0.35, 5505),
+		(35000, 0.30, 2755),
+		(9000, 0.25, 1005),
+		(4500, 0.2, 555),
+		(1500, 0.1, 105),
+		(0, 0.03, 0)
+	]
+	for item in TAX_TABLE:
+		if salary > item[0]:
+			return (salary * item[1] - item[2])
 
-try:
-	salary = int(sys.argv[1])
-except:
-	print("Value ERROR")
+def Cala_enhance(salary):
+	SOCIAL_INSURANCE = (0.08, 0.02, 0.005, 0, 0, 0.06)
+	social_insurance = salary * sum(SOCIAL_INSURANCE)
+	return social_insurance
 
-salary_rm_base = salary - Base
+def main():
+	if len(sys.argv) != 2:
+		print('Parameter Error')
+	try:
+		salary = int(sys.argv[1])
+	except:
+		print("Value ERROR")
 
-if salary_rm_base <= 0:
-	cnt = 0
-elif 0 < salary_rm_base <= 1500:
-    cnt = 1
-elif 1500 < salary_rm_base <= 4500:
-    cnt = 2
-elif 4500 < salary_rm_base <= 9000:
-    cnt = 3
-elif 9000 < salary_rm_base <= 35000:
-	cnt = 4
-elif 35000 < salary_rm_base <= 55000:
-	cnt = 5
-elif 55000 < salary_rm_base <= 80000:
-	cnt = 6
-elif salary_rm_base > 80000:
-	cnt = 7
+	salary_rm_base = salary - Cala_enhance(salary) - Base
+	TAX = Cala_Tax(salary_rm_base)
 
-#print(TAX_RATE[cnt])
-#print(TAX_De[cnt])
-TAX = (salary_rm_base * TAX_RATE[cnt]) - TAX_De[cnt]
+	format(TAX, ".2f")
+	print("%.2f" %TAX)
 
-format(TAX, ".2f")
-print("%.2f" %TAX)
-
+if __name__ == "__main__":
+	main()
