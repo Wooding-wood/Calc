@@ -12,10 +12,10 @@ class Config(object):
 	def get_config(self):
 		if os.path.exists(self.file):
 			with open(self.file) as config:
-				# for line in config:                          have question
+				# for line in config:                          
 				for line in config:
-					line_split = line.split(' = ')
-					print(line_split)
+					line_split = line.strip().split(' = ')
+					#print(line_split)
 					if len(line_split) != 2:
 						print("Config File Parameter Error")
 					else:
