@@ -79,11 +79,11 @@ class calac(object):
 
 	def OutputFile(self):
 		with open(self.Output, 'w') as file:
-			print (self.FormatResult)
+			#print (self.FormatResult)
 			for str in self.FormatResult:
-				print(str)
+				#print(str)
 				writer = csv.writer(file)
-				writer.writerow(str)
+				writer.writerow([str])
 
 
 	def TAX(self, salary):
