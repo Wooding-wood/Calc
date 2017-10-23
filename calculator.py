@@ -5,30 +5,52 @@ import os
 import copy
 import csv
 from multiprocessing import Process, Queue
+import getopt
+import configparser
+
 
 #Class
 class Config(object):
-	def __init__(self, configfile):
+	def __init__(self, configfile, city):
 		self.file = configfile
-		self._config = {}
+		self._config = []
+		self.city = city.upper()
+	# def get_config(self):
+	# 	if os.path.exists(self.file):
+	# 		with open(self.file) as config:
+	# 			# for line in config:                          
+	# 			for line in config:
+	# 				line_split = line.strip().split(' = ')
+	# 				#print(line_split)
+	# 				if len(line_split) != 2:
+	# 					print("Config File Parameter Error")
+	# 				else:
+	# 					try:
+	# 						self._config[line_split[0]] = float(line_split[1])
+	# 					except:
+	# 						print("Config Parameter Error")
+	# 			return self._config
+	# 	else:			
+	# 		print("Can't found file,Please try again")
+	# 		sys.exit()
 	def get_config(self):
 		if os.path.exists(self.file):
-			with open(self.file) as config:
-				# for line in config:                          
-				for line in config:
-					line_split = line.strip().split(' = ')
-					#print(line_split)
-					if len(line_split) != 2:
-						print("Config File Parameter Error")
-					else:
-						try:
-							self._config[line_split[0]] = float(line_split[1])
-						except:
-							print("Config Parameter Error")
-				return self._config
-		else:			
-			print("Can't found file,Please try again")
-			sys.exit()
+			config = configparser.ConfigParser()
+			config.read(self.file)
+
+			lists_header = config.sections()
+			if self.city in config:
+				conf = config.items(self.city)
+				#return conf
+			else:
+				conf = config['DEFAULT']
+				conf = config.items('DEFAULT')
+				#return conf
+			#print(conf)
+			return conf
+		else:
+			print("Can't found confing file, Please try again")
+			exit()
 
 
 class UserData(object):
@@ -108,17 +130,16 @@ class calac(object):
 					return (salary * item[1] - item[2])
 
 	def Cala_enhance(self, salary, config):
-		SOCIAL_INSURANCE = {}
-		SOCIAL_INSURANCE = copy.deepcopy(config)
-		SOCIAL_INSURANCE.pop('JiShuH')
-		SOCIAL_INSURANCE.pop('JiShuL')
+		total_insurance = 0
+		for i in range(6):
+			total_insurance += float(config[i+2][1])
 
-		if salary > config['JiShuH']:
-			social_insurance = config['JiShuH'] * sum(SOCIAL_INSURANCE.values())
-		elif salary > config['JiShuL']:
-			social_insurance = salary * sum(SOCIAL_INSURANCE.values())
+		if salary > float(config[1][1]):
+			social_insurance = float(config[1][1]) * total_insurance
+		elif salary > float(config[0][1]):
+			social_insurance = salary * total_insurance
 		else:
-			social_insurance = config['JiShuL'] * sum(SOCIAL_INSURANCE.values())
+			social_insurance = float(config[0][1]) * total_insurance
 
 		return social_insurance
 
@@ -126,22 +147,27 @@ class calac(object):
 
 #
 def argv_input():
-	para = {'-c':'', '-d':'', '-o':''}
+	para = {'-c':'test.cfg', '-d':'UserData.csv', '-o':'gongzi.csv', '-C':''}
 	#print(sys.argv)
-	if len(sys.argv) != 7:
-		print('Parameter Error')
+	try:
+		args = sys.argv[1:]
+		optlist, args= getopt.getopt(args, 'C:c:d:o:h', ["help"])
+		#print (optlist)
+		for a in optlist:
+			if(a[0] in ('-h', "--help")):
+				usage()
+				exit()
+			else:
+				para[a[0]] = a[1]
+		#print (para)
+		return para
+	except:
+		print('Parament Error')
+		usage()
 		exit()
-	else:
-		try:
-			args = sys.argv[1:]
-			for index in para.keys():
-				index_num = args.index(index)
-				para[index] = args[index_num + 1]
-			return para
-		except:
-			print('Parameter Error')
-			exit()
 
+def usage():
+	print('Usage: calculator.py -C cityname -c configfile -d userdata -o resultdata')
 
 UserData_Queue = Queue()
 def User_Data(input_dic):
@@ -157,7 +183,7 @@ def Out_Put(config_dic, input_dic):
 def main():
 	input_dic = argv_input()
 
-	CONFIG = Config(input_dic['-c'])
+	CONFIG = Config(input_dic['-c'], input_dic['-C'])
 	config_dic = CONFIG.get_config()
 	#############################################a = UserData(input_dic['-d'])      class return not a dict
 	Process(target=User_Data, args=(input_dic, )).start()
