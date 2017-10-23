@@ -4,6 +4,7 @@ import sys
 import os
 import copy
 import csv
+from multiprocessing import Process, Queue
 
 #Class
 class Config(object):
@@ -129,6 +130,7 @@ def argv_input():
 	#print(sys.argv)
 	if len(sys.argv) != 7:
 		print('Parameter Error')
+		exit()
 	else:
 		try:
 			args = sys.argv[1:]
@@ -138,8 +140,19 @@ def argv_input():
 			return para
 		except:
 			print('Parameter Error')
+			exit()
 
 
+UserData_Queue = Queue()
+def User_Data(input_dic):
+	userdata = UserData(input_dic['-d'])
+	data_dic = userdata.get_userdata()
+	UserData_Queue.put(data_dic)
+
+def Out_Put(config_dic, input_dic):
+	output_file = input_dic['-o']
+	data_dic = UserData_Queue.get()
+	Calac = calac(data_dic, config_dic, output_file)
 
 def main():
 	input_dic = argv_input()
@@ -147,10 +160,10 @@ def main():
 	CONFIG = Config(input_dic['-c'])
 	config_dic = CONFIG.get_config()
 	#############################################a = UserData(input_dic['-d'])      class return not a dict
-	userdata = UserData(input_dic['-d'])
-	data_dic = userdata.get_userdata()
-	output_file = input_dic['-o']
-	Calac = calac(data_dic, config_dic, output_file)
+	Process(target=User_Data, args=(input_dic, )).start()
+	Process(target=Out_Put, args=(config_dic, input_dic, )).start()
+
+
 	# salary_rm_base = salary - Cala_enhance(salary) - Base
 	# TAX = Cala_Tax(salary_rm_base)
     #
