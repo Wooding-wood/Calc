@@ -7,6 +7,7 @@ import csv
 from multiprocessing import Process, Queue
 import getopt
 import configparser
+from datetime import date, datetime
 
 
 #Class
@@ -96,7 +97,8 @@ class calac(object):
 			insurance = self.Cala_enhance(salary, self.Config)
 			tax = self.TAX(salary - insurance)
 			self.result[name] = ["{:.2f}".format(i) for i in [salary, insurance, tax, (salary - insurance - tax)]]
-			self.FormatResult.append("%s,%s,%s,%s,%s" % (name, self.result[name][0],self.result[name][1], self.result[name][2], self.result[name][3]))
+			t = datetime.now()
+			self.FormatResult.append("%s,%s,%s,%s,%s,%s" % (name, self.result[name][0],self.result[name][1], self.result[name][2], self.result[name][3], datetime.strftime(t, '%Y-%m-%d %H:%M:%S')))
 		#print(self.FormatResult)
 
 
